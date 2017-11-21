@@ -11,9 +11,9 @@ class SDLogger: public System {
     void run();
   private:
     byte chipSelect;
-    char folder[31];
+    char folder[30];
     DataQueue* gpsQ,* radioQ;
-    const String gpsFile = "gpslog.csv", radioFile = "radiolog.csv";
+    const String gpsFile = "gpslog.csv", radioFile = "radlog.csv";
 };
 
 #endif

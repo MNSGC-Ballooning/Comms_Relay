@@ -5,6 +5,7 @@
 
 class Data {
   public:
+    virtual ~Data(){}
     virtual void toCharArray(char* data) = 0;
 };
 
@@ -27,9 +28,10 @@ class DateTime: public Data {
 
 class RadioData: public Data {
   public:
-    RadioData(char source, String message);
+    RadioData(DateTime* time, char source, String message);
     void toCharArray(char* data);
   private:
+    char time[8];
     char source;
     String message;
 };
@@ -43,7 +45,7 @@ class DataQueue {
       public:
         Node(Data* elem);
         Data* elem;
-        Node* next;
+        Node* next = NULL;
     };
     Node* head;
 };

@@ -70,9 +70,9 @@ DateTime::DateTime(int year, byte month, byte day, byte hour, byte minute, byte 
 
 void DateTime::toCharArray(char* data) {
   for (byte dataPos = 0, i = 0; i < 6; i++) {
-    data[dataPos] = dateTime[i]/10;
+    data[dataPos] = '0' + dateTime[i]/10;
     dataPos++;
-    data[dataPos] = dateTime[i]%10;
+    data[dataPos] = '0' + dateTime[i]%10;
     dataPos++;
     if (i == 5) break;
     else if (i == 2) data[dataPos] = '/';
@@ -82,14 +82,23 @@ void DateTime::toCharArray(char* data) {
   }
 }
 
-RadioData::RadioData(char source, String message):
+RadioData::RadioData(DateTime* time, char source, String message):
   source(source), message(message) {
+    char fullTime[18];
+    time->toCharArray(fullTime);
+    for (byte i = 0; i < 8; i++) {
+      this->time[i] = fullTime[i+9];
+    }
 }
 
 void RadioData::toCharArray(char* data) {
-  data[0] = source;
-  data[1] = ',';
-  message.toCharArray(data+2, message.length()+1);
+  for (byte i = 0; i < 8; i++) {
+    data[i] = time[i];
+  }
+  data[8] = ',';
+  data[9] = source;
+  data[10] = ',';
+  message.toCharArray(data+11, message.length()+1);
 }
 
 void DataQueue::push(Data* elem) {
@@ -115,3 +124,4 @@ Data* DataQueue::pop() {
 DataQueue::Node::Node(Data* elem) {
   this->elem = elem;
 }
+
