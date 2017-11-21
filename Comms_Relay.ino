@@ -11,10 +11,10 @@ DataQueue gpsLogQ, radioLogQ, transmitQ;
 
 DateTime now = DateTime(0,0,0,0,0,0);
 GPSmanager gpsManager = GPSmanager(&gpsSer, &now, &gpsLogQ, &transmitQ);
-//Relay relay = Relay(&downlinkSer, &xBeeSer, &now, &radioLogQ, &transmitQ);
+Relay relay = Relay(&downlinkSer, &xBeeSer, &now, &radioLogQ, &transmitQ);
 SDLogger sdLogger = SDLogger(chipSelect, &now, &gpsLogQ, &radioLogQ);
-System* systems[] = {//&gpsManager,
-                      //&relay,
+System* systems[] = {&gpsManager,
+                      &relay,
                       &sdLogger};
 
 void setup() {
