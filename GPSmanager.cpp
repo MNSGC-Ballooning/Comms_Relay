@@ -11,13 +11,15 @@ void GPSmanager::initialize() {
       delay(1);
       if (port->read() == 0x62) {
         gps = new UbloxGPS(port);
+        break;
       }
     }
   }
   if (gps == NULL) gps = new FlightGPS(port);
   gps->initialize();
+  gps->update();
   *now = DateTime(gps->getYear(), gps->getMonth(), gps->getDay(), gps->getHour(), gps->getMinute(), gps->getSecond());
-  gpsLogger = new GPSlogAction(1000, gps, logQ, transmitQ);
+  gpsLogger = new GPSlogAction(3000, gps, logQ, transmitQ);
 }
 
 void GPSmanager::run() {

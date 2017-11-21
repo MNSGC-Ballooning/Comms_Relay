@@ -37,14 +37,14 @@ void Relay::run() {
   {
     String downlink = xBee.read();
     if (!downlink.equals("")) {
-      logQ->push(new RadioData('X', downlink));
+      logQ->push(new RadioData(now, 'X', downlink));
       groundRadio.print(downlink);
     }
   }
   {
     String uplink = groundRadio.read();
     if (!uplink.equals("")) {
-      logQ->push(new RadioData('G', uplink));
+      logQ->push(new RadioData(now, 'G', uplink));
       if (uplink.substring(0,5).equals("IMAGE"))
         groundRadio.print("Error 404: Pi not found!");
       else
