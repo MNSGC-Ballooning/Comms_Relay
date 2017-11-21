@@ -6,6 +6,7 @@
 class System {
   public:
     System(DateTime* now):now(now){}
+    virtual ~System(){}
     virtual void initialize() = 0;
     virtual void run() = 0;
   protected:
