@@ -19,7 +19,7 @@ void GPSmanager::initialize() {
   gps->initialize();
   gps->update();
   *now = DateTime(gps->getYear(), gps->getMonth(), gps->getDay(), gps->getHour(), gps->getMinute(), gps->getSecond());
-  gpsLogger = new GPSlogAction(3000, gps, logQ, transmitQ);
+  gpsLogger = new GPSlogAction(3, gps, logQ, transmitQ);
 }
 
 void GPSmanager::run() {
@@ -28,15 +28,20 @@ void GPSmanager::run() {
   gpsLogger->check();
 }
 
-GPSmanager::GPSlogAction::GPSlogAction(unsigned long logTime, FlightGPS* gps, DataQueue* logQ, DataQueue* transmitQ):
-  RepeatingAction(logTime), gps(gps), logQ(logQ), transmitQ(transmitQ) {
+GPSmanager::GPSlogAction::GPSlogAction(byte beaconTime, FlightGPS* gps, DataQueue* logQ, DataQueue* transmitQ):
+  RepeatingAction(1000), beaconTime(beaconTime), gps(gps), logQ(logQ), transmitQ(transmitQ) {
 }
 
 void GPSmanager::GPSlogAction::execute() {
   GPSdata* logData = new GPSdata(gps->getHour(), gps->getMinute(), gps->getSecond(),
                                   gps->getLat(), gps->getLon(), gps->getAlt(), gps->getSats());
-  GPSdata* beaconData = new GPSdata(*logData);
+  
   logQ->push(logData);
-  transmitQ->push(beaconData);
+  if (reps == 2) {
+    GPSdata* beaconData = new GPSdata(*logData);
+    transmitQ->push(beaconData);
+    reps = 0;
+  }
+  else reps++;
 }
 

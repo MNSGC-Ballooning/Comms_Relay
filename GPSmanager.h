@@ -17,11 +17,13 @@ class GPSmanager: public System {
     DataQueue* logQ,* transmitQ;
     class GPSlogAction: public RepeatingAction {
       public:
-        GPSlogAction(unsigned long logTime, FlightGPS* gps, DataQueue* logQ, DataQueue* transmitQ);
+        GPSlogAction(byte beaconTime, FlightGPS* gps, DataQueue* logQ, DataQueue* transmitQ);
       private:
-        void execute();
+        byte beaconTime;  //time in seconds between automatic GPS beacons
+        byte reps;
         FlightGPS* gps;
         DataQueue* logQ,* transmitQ;
+        void execute();
     };
     GPSlogAction* gpsLogger;
 };
