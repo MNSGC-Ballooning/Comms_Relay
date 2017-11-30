@@ -1,7 +1,7 @@
 #include "SDLogger.h"
 
 SDLogger::SDLogger(byte chipSelect, DateTime* now, DataQueue* gpsQ, DataQueue* radioQ):
-  System(now), chipSelect(chipSelect), gpsQ(gpsQ), radioQ(radioQ) {
+  System(now,NULL), chipSelect(chipSelect), gpsQ(gpsQ), radioQ(radioQ) {
 }
 
 void SDLogger::initialize() {
@@ -10,7 +10,10 @@ void SDLogger::initialize() {
   folder[14] = '_';
   folder[17] = '/';
   pinMode(chipSelect, OUTPUT);
-  SD.begin(chipSelect);
+  if (!SD.begin(chipSelect)) {
+    enabled = false;
+    return;
+  }
   if (!SD.exists(folder)) SD.mkdir(folder);
   gpsFile.toCharArray(folder+18, 13);
   File file = SD.open(folder, FILE_WRITE);
@@ -23,28 +26,28 @@ void SDLogger::initialize() {
 }
 
 void SDLogger::run() {
-  Data* logData = gpsQ->pop();
-  while (logData) {
-    gpsFile.toCharArray(folder+18, 13);
-    File file = SD.open(folder, FILE_WRITE);
-    char data[42] = {0};
-    logData->toCharArray(data);
-    file.println(String(data) + ',');
-    file.close();
-    delete logData; logData = NULL;
-    logData = gpsQ->pop();
-  }
-  logData = radioQ->pop();
-  while (logData) {
-    radioFile.toCharArray(folder+18, 13);
-    File file = SD.open(folder, FILE_WRITE);
-    char data[42] = {0};
-    now->toCharArray(data);
-    logData->toCharArray(data);
-    file.println(String(data) + ',');
-    file.close();
+  for (Data* logData = gpsQ->pop(); logData; logData = gpsQ->pop()) {
+    if (enabled) {
+      gpsFile.toCharArray(folder+18, 13);
+      File file = SD.open(folder, FILE_WRITE);
+      char data[42] = {0};
+      logData->toCharArray(data);
+      file.println(String(data) + ',');
+      file.close();
+    }
     delete logData;
-    logData = radioQ->pop();
+  }
+  for (Data* logData = radioQ->pop(); logData; logData = radioQ->pop()) {
+    if (enabled) {
+      radioFile.toCharArray(folder+18, 13);
+      File file = SD.open(folder, FILE_WRITE);
+      char data[42] = {0};
+      now->toCharArray(data);
+      logData->toCharArray(data);
+      file.println(String(data) + ',');
+      file.close();
+    }
+    delete logData;
   }
 }
 

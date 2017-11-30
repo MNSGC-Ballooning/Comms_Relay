@@ -1,7 +1,7 @@
 #include "GPSmanager.h"
 
-GPSmanager::GPSmanager(HardwareSerial* port, DateTime* now, DataQueue* logQ, DataQueue* transmitQ):
-  System(now), port(port), logQ(logQ), transmitQ(transmitQ) {
+GPSmanager::GPSmanager(HardwareSerial* port, DateTime* now, bool* bypassFlag, DataQueue* logQ, DataQueue* transmitQ):
+  System(now,bypassFlag), port(port), logQ(logQ), transmitQ(transmitQ) {
 }
 
 void GPSmanager::initialize() {
@@ -17,9 +17,15 @@ void GPSmanager::initialize() {
   }
   if (gps == NULL) gps = new FlightGPS(port);
   gps->initialize();
-  gps->update();
-  *now = DateTime(gps->getYear(), gps->getMonth(), gps->getDay(), gps->getHour(), gps->getMinute(), gps->getSecond());
   gpsLogger = new GPSlogAction(3, gps, logQ, transmitQ);
+  while (gps->getFixAge() == 0xFFFFFFFF) {
+    gps->update();
+    if (*bypassFlag) {
+      enabled = false;
+      return;
+    }
+  }
+  *now = DateTime(gps->getYear(), gps->getMonth(), gps->getDay(), gps->getHour(), gps->getMinute(), gps->getSecond());
 }
 
 void GPSmanager::run() {

@@ -6,18 +6,25 @@
 #define xBeeSer Serial2
 #define downlinkSer Serial3
 #define chipSelect 14
+#define bypassButton 23
+
+bool bypassFlag = false;
 
 DataQueue gpsLogQ, radioLogQ, transmitQ;
 
 DateTime now = DateTime(0,0,0,0,0,0);
-GPSmanager gpsManager = GPSmanager(&gpsSer, &now, &gpsLogQ, &transmitQ);
+GPSmanager gpsManager = GPSmanager(&gpsSer, &now, &bypassFlag, &gpsLogQ, &transmitQ);
 Relay relay = Relay(&downlinkSer, &xBeeSer, &now, &radioLogQ, &transmitQ);
 SDLogger sdLogger = SDLogger(chipSelect, &now, &gpsLogQ, &radioLogQ);
-System* systems[] = {&gpsManager,
-                      &relay,
+System* systems[] = {&relay,
+                      &gpsManager,
                       &sdLogger};
 
+void bypass_ISR() {bypassFlag = true;}
+
 void setup() {
+  pinMode(bypassButton,INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(bypassButton),bypass_ISR,FALLING);
   for (System* sys : systems) {
     sys->initialize();
   }

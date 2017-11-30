@@ -18,7 +18,7 @@ String Radio::read() {
 }
 
 Relay::Relay(HardwareSerial* downlinkSerial, HardwareSerial* xBeeSerial, DateTime* now, DataQueue* logQ, DataQueue* transmitQ):
-  System(now), groundRadio(downlinkSerial), xBee(xBeeSerial), logQ(logQ), transmitQ(transmitQ) {
+  System(now,NULL), groundRadio(downlinkSerial), xBee(xBeeSerial), logQ(logQ), transmitQ(transmitQ) {
 }
 
 void Relay::initialize() {

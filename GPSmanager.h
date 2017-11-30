@@ -8,7 +8,7 @@
 
 class GPSmanager: public System {
   public:
-    GPSmanager(HardwareSerial* port, DateTime* now, DataQueue* logQ, DataQueue* transmitQ);
+    GPSmanager(HardwareSerial* port, DateTime* now, bool* bypassFlag, DataQueue* logQ, DataQueue* transmitQ);
     void initialize();
     void run();
   private:
