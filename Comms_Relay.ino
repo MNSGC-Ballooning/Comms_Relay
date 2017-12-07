@@ -7,13 +7,14 @@
 #define downlinkSer Serial3
 #define chipSelect 14
 #define bypassButton 23
+#define beaconTime 3
 
 bool bypassFlag = false;
 
 DataQueue gpsLogQ, radioLogQ, transmitQ;
 
 DateTime now = DateTime(0,0,0,0,0,0);
-GPSmanager gpsManager = GPSmanager(&gpsSer, &now, &bypassFlag, &gpsLogQ, &transmitQ);
+GPSmanager gpsManager = GPSmanager(&gpsSer, &now, &bypassFlag, beaconTime, &gpsLogQ, &transmitQ);
 Relay relay = Relay(&downlinkSer, &xBeeSer, &now, &radioLogQ, &transmitQ);
 SDLogger sdLogger = SDLogger(chipSelect, &now, &gpsLogQ, &radioLogQ);
 System* systems[] = {&relay,

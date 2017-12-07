@@ -8,11 +8,12 @@
 
 class GPSmanager: public System {
   public:
-    GPSmanager(HardwareSerial* port, DateTime* now, bool* bypassFlag, DataQueue* logQ, DataQueue* transmitQ);
+    GPSmanager(HardwareSerial* port, DateTime* now, bool* bypassFlag, byte beaconTime, DataQueue* logQ, DataQueue* transmitQ);
     void initialize();
     void run();
   private:
     HardwareSerial* port;
+    byte beaconTime;
     FlightGPS* gps;
     DataQueue* logQ,* transmitQ;
     class GPSlogAction: public RepeatingAction {
@@ -21,7 +22,7 @@ class GPSmanager: public System {
       private:
         byte beaconTime;  //time in seconds between automatic GPS beacons
         byte reps;
-        FlightGPS* gps;
+        FlightGPS* gps = NULL;
         DataQueue* logQ,* transmitQ;
         void execute();
     };
