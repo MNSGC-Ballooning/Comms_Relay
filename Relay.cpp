@@ -27,29 +27,22 @@ void Relay::initialize() {
 }
 
 void Relay::run() {
-  {
+  for (Data* gpsData = transmitQ->pop(); gpsData; gpsData = transmitQ->pop()) {
     char data[42] = {0};
-    Data* gpsData = transmitQ->pop();
     gpsData->toCharArray(data);
     groundRadio.print(String(data) + '!');
-    delete gpsData; gpsData = NULL;
+    delete gpsData;
   }
-  {
-    String downlink = xBee.read();
-    if (!downlink.equals("")) {
-      logQ->push(new RadioData(now, 'X', downlink));
-      groundRadio.print(downlink);
-    }
+  for (String downlink = xBee.read(); !downlink.equals(""); downlink = xBee.read()) {
+    logQ->push(new RadioData(now, 'X', downlink));
+    groundRadio.print(downlink);
   }
-  {
-    String uplink = groundRadio.read();
-    if (!uplink.equals("")) {
-      logQ->push(new RadioData(now, 'G', uplink));
-      if (uplink.substring(0,5).equals("IMAGE"))
-        groundRadio.print("Error 404: Pi not found!");
-      else
-        xBee.print(uplink);
-    }
+  for (String uplink = groundRadio.read(); !uplink.equals(""); uplink = groundRadio.read()) {
+    logQ->push(new RadioData(now, 'G', uplink));
+    if (uplink.substring(0,5).equals("IMAGE"))
+      groundRadio.print("Error 404: Pi not found!");
+    else
+      xBee.print(uplink);
   }
 }
 
