@@ -38,6 +38,10 @@ void GPSmanager::initialize() {
 //loop() code for GPSmanager
 void GPSmanager::run() {
   gps->update(); //get most recent gps data
+  if (!enabled) {
+    if (gps->getFixAge() != 0xFFFFFFFF) enabled = true;
+    else return;
+  }
   //update global time object
   *now = DateTime(gps->getYear(), gps->getMonth(), gps->getDay(), gps->getHour(), gps->getMinute(), gps->getSecond());
   //check for necessary log or beacon actions
