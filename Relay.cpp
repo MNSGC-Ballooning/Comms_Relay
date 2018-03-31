@@ -28,7 +28,7 @@ Relay::Relay(HardwareSerial* downlinkSerial, HardwareSerial* xBeeSerial, DateTim
 
 //Relay setup() code
 void Relay::initialize() {
-  groundRadio.begin(9600);
+  groundRadio.begin(38400);
   xBee.begin(9600);
 }
 
@@ -51,6 +51,8 @@ void Relay::run() {
     logQ->push(new RadioData(now, 'G', uplink));
     if (uplink.substring(0,5).equals("IMAGE")) //command meant for Raspberry-Pi based still image system
       groundRadio.print("Error 404: Pi not found!");
+    else if (uplink.charAt(uplink.length()-1) == '\n')
+      xBee.print(uplink);
     else
       xBee.print(uplink + '!');
   }
