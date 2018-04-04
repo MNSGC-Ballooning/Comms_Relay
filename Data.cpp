@@ -1,5 +1,14 @@
 #include "Data.h"
 
+//RawData constructor
+RawData::RawData(String data):
+  message(data) {
+}
+
+void RawData::toCharArray(char* data) {
+  message.toCharArray(data, message.length()+1);
+}
+
 //GPSdata constructor
 GPSdata::GPSdata(byte hour, byte minute, byte second, float lat, float lon, float alt, byte sats):
   hour(hour), minute(minute), second(second), lat(lat), lon(lon), alt(alt), sats(sats) {
@@ -103,9 +112,12 @@ void RadioData::toCharArray(char* data) {
     data[i] = time[i];
   }
   data[8] = ',';
-  data[9] = source;
-  data[10] = ',';
-  message.toCharArray(data+11, message.length()+1);
+  if (source == 'G')
+    message.toCharArray(data+9, message.length()+1);
+  else {
+    data[9] = ',';
+    message.toCharArray(data+10, message.length()+1);
+  }
 }
 
 //Adds a data object to a queue via its pointer

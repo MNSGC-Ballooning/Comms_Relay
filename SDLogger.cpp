@@ -20,15 +20,33 @@ void SDLogger::initialize() {
   if (!SD.exists(folder)) SD.mkdir(folder); //create timestamped folder
   
   //create and set up gps datalog
+  for (Data* logData = gpsQ->pop(); logData; logData = gpsQ->pop()) {
+    gpsFile.toCharArray(folder+18, 13);
+    File file = SD.open(folder, FILE_WRITE);
+    char data[42] = {0};
+    logData->toCharArray(data);
+    file.println(String(data) + ',');
+    file.close();
+    delete logData;
+  }
   gpsFile.toCharArray(folder+18, 13);
   File file = SD.open(folder, FILE_WRITE);
   file.println("Time,Lat,Lon,Alt,Sats");
   file.close();
   
   //create and set up radio datalog
+  for (Data* logData = radioQ->pop(); logData; logData = radioQ->pop()) {
+    radioFile.toCharArray(folder+18, 13);
+    File file = SD.open(folder, FILE_WRITE);
+    char data[42] = {0};
+    logData->toCharArray(data);
+    file.println(String(data) + ',');
+    file.close();
+    delete logData;
+  }
   radioFile.toCharArray(folder+18, 13); 
   file = SD.open(folder, FILE_WRITE);
-  file.println("Time,Source,Message");
+  file.println("Time,GS,XBee");
   file.close();
 }
 

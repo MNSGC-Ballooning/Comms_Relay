@@ -28,8 +28,16 @@ Relay::Relay(HardwareSerial* downlinkSerial, HardwareSerial* xBeeSerial, DateTim
 
 //Relay setup() code
 void Relay::initialize() {
+  //start radios at appropriate baud rate
   groundRadio.begin(38400);
   xBee.begin(9600);
+  //send any waiting startup messages
+  for (Data* startupMsg = transmitQ->pop(); startupMsg; startupMsg = transmitQ->pop()) {
+    char data[42] = {0};
+    startupMsg->toCharArray(data);
+    groundRadio.print(String(data) + "!\n");
+    delete startupMsg;
+  }
 }
 
 //Relay loop() code
@@ -38,13 +46,13 @@ void Relay::run() {
   for (Data* gpsData = transmitQ->pop(); gpsData; gpsData = transmitQ->pop()) {
     char data[42] = {0};
     gpsData->toCharArray(data);
-    groundRadio.print(String(data) + '!');
+    groundRadio.print(String(data) + "!\n");
     delete gpsData;
   }
   //Check for incoming XBee messages, and relay to ground
   for (String downlink = xBee.read(); !downlink.equals(""); downlink = xBee.read()) {
     logQ->push(new RadioData(now, 'X', downlink));
-    groundRadio.print(downlink + '!');
+    groundRadio.print(downlink + "!\n");
   }
   //Repeat for incoming ground station messages to xbee
   for (String uplink = groundRadio.read(); !uplink.equals(""); uplink = groundRadio.read()) {
@@ -54,7 +62,7 @@ void Relay::run() {
     else if (uplink.charAt(uplink.length()-1) == '\n')
       xBee.print(uplink);
     else
-      xBee.print(uplink + '!');
+      xBee.print(uplink + "!\n");
   }
 }
 

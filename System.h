@@ -11,6 +11,7 @@ class System {
     //Functions that define what a given system does during setup() and each iteration of loop()
     virtual void initialize() = 0;
     virtual void run() = 0;
+    bool isEnabled(){return enabled;}
   protected:
     DateTime* now; //pointer to common DateTime object used for timestamping. Updated by GPS
     bool* bypassFlag; //pointer to common bypass flag triggered by push switch. Used to skip parts of setup if needed

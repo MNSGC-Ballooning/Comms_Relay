@@ -6,7 +6,7 @@
 #define gpsSer Serial1
 #define xBeeSer Serial2
 #define downlinkSer Serial3
-#define chipSelect 14
+#define chipSelect 15
 #define bypassButton 23
 #define beaconTime 3
 
@@ -30,6 +30,12 @@ System* systems[] = {&relay,
 void bypass_ISR() {bypassFlag = true;}
 
 void setup() {
+  //Startup notifications
+  RawData* startupLog = new RawData("Comms System Start");
+  RawData* startupMsg = new RawData(*startupLog);
+  radioLogQ.push(startupLog);
+  transmitQ.push(startupMsg);
+  
   //setup bypass
   pinMode(bypassButton,INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(bypassButton),bypass_ISR,FALLING);
@@ -37,6 +43,11 @@ void setup() {
   //initialize systems
   for (System* sys : systems) {
     sys->initialize();
+  }
+  //Because SDLogger has no ability to request a transmission, handle SD card status message here
+  if (!sdLogger.isEnabled()) {
+    startupMsg = new RawData("SD card Error");
+    transmitQ.push(startupMsg);
   }
 }
 

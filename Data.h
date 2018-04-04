@@ -11,6 +11,15 @@ class Data {
     virtual void toCharArray(char* data) = 0;
 };
 
+//Any data that just needs to be saved as a pure string
+class RawData: public Data {
+  public:
+    RawData(String data);
+    void toCharArray(char* data);
+  private:
+    String message;
+};
+
 //GPS system data
 class GPSdata: public Data {
   public:
