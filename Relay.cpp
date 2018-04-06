@@ -52,15 +52,16 @@ void Relay::run() {
   //Check for incoming XBee messages, and relay to ground
   for (String downlink = xBee.read(); !downlink.equals(""); downlink = xBee.read()) {
     logQ->push(new RadioData(now, 'X', downlink));
-    groundRadio.print(downlink + "!\n");
+    if (downlink.charAt(downlink.length()-1) == '\n')
+      groundRadio.print(downlink);
+    else
+      groundRadio.print(downlink + "!\n");
   }
   //Repeat for incoming ground station messages to xbee
   for (String uplink = groundRadio.read(); !uplink.equals(""); uplink = groundRadio.read()) {
     logQ->push(new RadioData(now, 'G', uplink));
     if (uplink.substring(0,5).equals("IMAGE")) //command meant for Raspberry-Pi based still image system
-      groundRadio.print("Error 404: Pi not found!");
-    else if (uplink.charAt(uplink.length()-1) == '\n')
-      xBee.print(uplink);
+      groundRadio.print("Error 404: Pi not found!\n");
     else
       xBee.print(uplink + "!\n");
   }

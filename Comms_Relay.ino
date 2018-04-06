@@ -8,7 +8,9 @@
 #define downlinkSer Serial3
 #define chipSelect 15
 #define bypassButton 23
-#define beaconTime 3
+
+//Beacon rate - time in seconds between automatic gps beacons
+#define beaconTime 30
 
 //flag for tracking bypass switch
 bool bypassFlag = false;
