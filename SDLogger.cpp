@@ -1,5 +1,8 @@
 #include "SDLogger.h"
 
+//Set size of data arrays - increase if runtime crashes start occuring
+#define dataArraySize 128
+
 //SDLogger constructor
 SDLogger::SDLogger(byte chipSelect, DateTime* now, DataQueue* gpsQ, DataQueue* radioQ):
   System(now,NULL), chipSelect(chipSelect), gpsQ(gpsQ), radioQ(radioQ) {
@@ -38,7 +41,7 @@ void SDLogger::initialize() {
   for (Data* logData = radioQ->pop(); logData; logData = radioQ->pop()) {
     radioFile.toCharArray(folder+18, 13);
     File file = SD.open(folder, FILE_WRITE);
-    char data[42] = {0};
+    char data[dataArraySize] = {0};
     logData->toCharArray(data);
     file.println(String(data) + ',');
     file.close();

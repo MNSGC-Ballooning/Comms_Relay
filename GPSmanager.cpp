@@ -10,26 +10,7 @@ void GPSmanager::initialize() {
   port->begin(9600);
   RawData* gpsLog, * gpsMsg;
   //check for 'mu' 'B' prefix that indicates Ublox is present. If so, create Ublox gps object
-  for (unsigned long startTime = millis(); millis() - startTime < 10000;) {
-    if (port->read() == 0xB5) {
-      delay(1);
-      if (port->read() == 0x62) {
-        gps = new UbloxGPS(port);
-        gpsLog = new RawData("Ublox Detected");
-        gpsMsg = new RawData(*gpsLog);
-        logQ->push(gpsLog);
-        transmitQ->push(gpsMsg);
-        break;
-      }
-    }
-  }
-  if (gps == NULL) {
-    gps = new FlightGPS(port); //if no Ublox detected, use default gps object
-    gpsLog = new RawData("No Ublox Detected");
-    gpsMsg = new RawData(*gpsLog);
-    logQ->push(gpsLog);
-    transmitQ->push(gpsMsg);
-  }
+  gps = new UbloxGPS(port);
   gps->initialize(); //gps object initialization code
   gpsLogger = new GPSlogAction(beaconTime, gps, logQ, transmitQ); //create gpsLogger object
 
